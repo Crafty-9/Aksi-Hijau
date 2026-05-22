@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aksi Hijau - Tangerang Selatan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-green': '#059669', // emerald-600
+                        'brand-light': '#10B981', // emerald-500
+                        'brand-dark': '#047857',  // emerald-700
+                        'brand-blue': '#0ea5e9',  // sky-500
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Styles for Hide/Show functionality */
+        .hidden-section { display: none; }
+        .active-section { display: block; }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md fixed w-full z-50 top-0 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="showSection('public-view')">
+                    <svg class="h-8 w-8 text-brand-green mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="font-bold text-xl text-brand-dark tracking-tight">Aksi Hijau</span>
+                </div>
+                
+                <!-- Desktop Menu (Public) -->
+                <div id="public-menu" class="hidden md:flex space-x-8">
+                    <a href="#beranda" class="text-gray-600 hover:text-brand-green px-3 py-2 rounded-md text-sm font-medium transition-colors">Beranda</a>
+                    <a href="#tentang" class="text-gray-600 hover:text-brand-green px-3 py-2 rounded-md text-sm font-medium transition-colors">Tentang Kami</a>
+                    <a href="#proyek" class="text-gray-600 hover:text-brand-green px-3 py-2 rounded-md text-sm font-medium transition-colors">Proyek & Donasi</a>
+                    <button onclick="openAuthModal('login')" class="text-brand-green border border-brand-green hover:bg-brand-green hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-all">Masuk</button>
+                    <button onclick="openAuthModal('register')" class="bg-brand-green hover:bg-brand-dark text-white px-4 py-2 rounded-full text-sm font-medium transition-all shadow-sm">Daftar Member</button>
+                </div>
+
+                <!-- Desktop Menu (Member) -->
+                <div id="member-menu" class="hidden md:flex space-x-6 items-center">
+                    <span class="text-sm text-gray-600">Halo, <strong id="user-name-display">Member</strong></span>
+                    <button onclick="showSection('member-dashboard')" class="text-gray-600 hover:text-brand-green px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</button>
+                    <button onclick="logout()" class="text-red-500 hover:bg-red-50 px-4 py-2 rounded-full text-sm font-medium transition-all">Keluar</button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-green focus:outline-none">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu-dropdown" class="hidden md:hidden bg-white border-t border-gray-100 px-2 pt-2 pb-3 space-y-1 sm:px-3 shadow-lg">
+            <div id="mobile-public-links">
+                <a href="#beranda" onclick="closeMobileMenu()" class="block text-gray-600 hover:text-brand-green hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium">Beranda</a>
+                <a href="#tentang" onclick="closeMobileMenu()" class="block text-gray-600 hover:text-brand-green hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium">Tentang Kami</a>
+                <a href="#proyek" onclick="closeMobileMenu()" class="block text-gray-600 hover:text-brand-green hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium">Proyek & Donasi</a>
+                <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col space-y-2 px-3">
+                    <button onclick="openAuthModal('login'); closeMobileMenu()" class="w-full text-center text-brand-green border border-brand-green hover:bg-brand-green hover:text-white px-4 py-2 rounded-full text-sm font-medium">Masuk</button>
+                    <button onclick="openAuthModal('register'); closeMobileMenu()" class="w-full text-center bg-brand-green hover:bg-brand-dark text-white px-4 py-2 rounded-full text-sm font-medium">Daftar Member</button>
+                </div>
+            </div>
+            <div id="mobile-member-links" class="hidden">
+                 <div class="px-3 py-2 text-sm text-gray-600 border-b border-gray-100 mb-2">Halo, <strong id="mobile-user-name-display">Member</strong></div>
+                 <button onclick="showSection('member-dashboard'); closeMobileMenu()" class="w-full text-left text-gray-600 hover:text-brand-green hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium">Dashboard</button>
+                 <button onclick="logout(); closeMobileMenu()" class="w-full text-left text-red-500 hover:bg-red-50 px-3 py-2 rounded-md text-base font-medium mt-2">Keluar</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper to handle view switching -->
+    <main class="flex-grow pt-16">
+        
+        <!-- ========================================== -->
+        <!-- PUBLIC VIEW (Landing Page)                 -->
+        <!-- ========================================== -->
+        <div id="public-view" class="active-section">
+            
+            <!-- Hero Section -->
+            <section id="beranda" class="relative bg-brand-dark overflow-hidden">
+                <div class="absolute inset-0">
+                    <!-- Placeholder background image -->
+                    <img class="w-full h-full object-cover opacity-30" src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Mangrove Forest">
+                    <div class="absolute inset-0 bg-gradient-to-r from-brand-dark to-transparent mix-blend-multiply"></div>
+                </div>
+                <div class="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+                    <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl mb-6">
+                        Hijaukan Pesisir,<br>
+                        <span class="text-brand-light">Bersihkan Masa Depan</span>
+                    </h1>
+                    <p class="mt-4 max-w-2xl text-xl text-gray-200 mb-10">
+                        Kami pemuda Tangerang Selatan bergerak bersama menyelamatkan ekosistem pesisir melalui penanaman mangrove dan pengelolaan sampah yang berkelanjutan.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center w-full max-w-md">
+                        <a href="#proyek" class="w-full sm:w-auto flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-brand-dark bg-white hover:bg-gray-50 transition-colors shadow-lg">
+                            Dukung Proyek
+                        </a>
+                        <button onclick="openAuthModal('register')" class="w-full sm:w-auto flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-full text-white hover:bg-white hover:text-brand-dark transition-colors">
+                            Gabung Relawan
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tentang Kami Section -->
+            <section id="tentang" class="py-20 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+                        <div class="mb-10 lg:mb-0">
+                            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl mb-6">Tentang Aksi Hijau</h2>
+                            <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                                Berawal dari keprihatinan melihat kondisi pesisir yang terancam abrasi dan tumpukan sampah, Aksi Hijau lahir sebagai inisiatif pemuda Tangerang Selatan. Kami percaya bahwa perubahan besar dimulai dari langkah kecil yang konsisten.
+                            </p>
+                            <div class="space-y-4">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <div class="flex items-center justify-center h-10 w-10 rounded-md bg-brand-light text-white">
+                                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-lg leading-6 font-medium text-gray-900">Fokus Ekologi</h3>
+                                        <p class="mt-1 text-base text-gray-500">Menjaga benteng alami pantai dengan hutan mangrove.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <div class="flex items-center justify-center h-10 w-10 rounded-md bg-brand-blue text-white">
+                                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-lg leading-6 font-medium text-gray-900">Edukasi Warga</h3>
+                                        <p class="mt-1 text-base text-gray-500">Membangun kesadaran sirkular ekonomi lewat pengelolaan sampah mandiri.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative rounded-2xl overflow-hidden shadow-xl group">
+                            <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Kegiatan Bersih Pantai" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Proyek & Donasi Section -->
+            <section id="proyek" class="py-20 bg-gray-50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">Proyek Berjalan</h2>
+                        <p class="mt-4 max-w-2xl text-lg text-gray-500 mx-auto">Mari berkontribusi. Setiap rupiah dan tenaga Anda membawa dampak nyata bagi lingkungan kita.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        
+                        <!-- Project 1: Mangrove -->
+                        <div class="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300">
+                            <div class="h-48 overflow-hidden relative">
+                                <img src="https://images.unsplash.com/photo-1621272036047-bf0ebfd413e6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Bibit Mangrove" class="w-full h-full object-cover">
+                                <div class="absolute top-4 right-4 bg-white text-brand-dark px-3 py-1 rounded-full text-xs font-bold shadow-sm">Mendesak</div>
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Penanaman 10.000 Bibit Mangrove</h3>
+                                <p class="text-gray-600 text-sm mb-4 flex-grow">Mencegah abrasi di pesisir utara Tangerang. Mangrove juga menjadi habitat alami biota laut dan menyerap karbon secara efektif.</p>
+                                
+                                <!-- Progress Bar Simulation -->
+                                <div class="mt-auto">
+                                    <div class="flex justify-between text-sm font-medium text-gray-900 mb-1">
+                                        <span id="mangrove-collected-text">Rp 12.500.000</span>
+                                        <span class="text-gray-500">Target: Rp 25.000.000</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 overflow-hidden">
+                                        <div id="mangrove-progress-bar" class="bg-brand-light h-2.5 rounded-full" style="width: 50%; transition: width 0.5s ease-in-out;"></div>
+                                    </div>
+                                    
+                                    <button onclick="simulateDonation('mangrove')" class="w-full bg-brand-green hover:bg-brand-dark text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-sm flex justify-center items-center">
+                                        <span>Donasi Rp 50.000</span>
+                                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project 2: Edukasi Sampah -->
+                        <div class="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col hover:shadow-xl transition-shadow duration-300">
+                            <div class="h-48 overflow-hidden relative">
+                                <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Edukasi Warga" class="w-full h-full object-cover">
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Workshop Daur Ulang Warga Pesisir</h3>
+                                <p class="text-gray-600 text-sm mb-4 flex-grow">Memberikan pelatihan mengolah sampah plastik menjadi barang bernilai jual kepada ibu-ibu di desa pesisir.</p>
+                                
+                                <!-- Progress Bar Simulation -->
+                                <div class="mt-auto">
+                                    <div class="flex justify-between text-sm font-medium text-gray-900 mb-1">
+                                        <span id="sampah-collected-text">Rp 4.000.000</span>
+                                        <span class="text-gray-500">Target: Rp 10.000.000</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 overflow-hidden">
+                                        <div id="sampah-progress-bar" class="bg-brand-blue h-2.5 rounded-full" style="width: 40%; transition: width 0.5s ease-in-out;"></div>
+                                    </div>
+                                    
+                                    <button onclick="simulateDonation('sampah')" class="w-full bg-brand-blue hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors shadow-sm flex justify-center items-center">
+                                        <span>Donasi Rp 50.000</span>
+                                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- MEMBER DASHBOARD VIEW (Private)            -->
+        <!-- ========================================== -->
+        <div id="member-dashboard" class="hidden-section bg-gray-50 min-h-[calc(100vh-4rem)] py-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <!-- Welcome Banner -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 mb-8 flex flex-col md:flex-row items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Selamat datang kembali, <span id="dash-user-name" class="text-brand-green">Relawan</span>! 🌿</h1>
+                        <p class="text-gray-600">Terima kasih telah menjadi bagian dari pergerakan Aksi Hijau.</p>
+                    </div>
+                    <div class="mt-6 md:mt-0 bg-emerald-50 text-brand-dark px-6 py-4 rounded-xl border border-emerald-100 text-center">
+                        <span class="block text-sm font-medium uppercase tracking-wider text-brand-light mb-1">Status Member</span>
+                        <span class="block text-2xl font-bold">Relawan Aktif</span>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Stat 1 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
+                        <div class="p-3 rounded-full bg-blue-50 text-brand-blue mr-4">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Total Donasi Anda</p>
+                            <p class="text-2xl font-bold text-gray-900" id="dash-total-donation">Rp 0</p>
+                        </div>
+                    </div>
+                    <!-- Stat 2 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
+                        <div class="p-3 rounded-full bg-emerald-50 text-brand-green mr-4">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Aksi Diikuti</p>
+                            <p class="text-2xl font-bold text-gray-900">0 <span class="text-base font-normal text-gray-500">Kegiatan</span></p>
+                        </div>
+                    </div>
+                    <!-- Stat 3 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center">
+                        <div class="p-3 rounded-full bg-orange-50 text-orange-500 mr-4">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Poin Hijau</p>
+                            <p class="text-2xl font-bold text-gray-900" id="dash-points">0 <span class="text-base font-normal text-gray-500">Pts</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Aktivitas Terakhir</h3>
+                        <button onclick="showSection('public-view'); setTimeout(() => { window.location.hash = '#proyek'; }, 100);" class="text-sm text-brand-green hover:underline font-medium">Cari Proyek Lain</button>
+                    </div>
+                    <ul class="divide-y divide-gray-100" id="activity-list">
+                        <!-- Items will be injected via JS -->
+                        <li class="px-6 py-8 text-center text-gray-500" id="empty-state">
+                            Belum ada aktivitas. Mulai donasi pertama Anda!
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="flex justify-center md:justify-start mb-6 md:mb-0 items-center">
+                    <svg class="h-6 w-6 text-brand-light mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="text-xl font-bold text-white">Aksi Hijau Tangsel</span>
+                </div>
+                <div class="flex justify-center space-x-6 md:order-2">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <span class="sr-only">Instagram</span>
+                        <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd"></path></svg>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <span class="sr-only">Email</span>
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-8 border-t border-gray-800 pt-8 md:flex md:items-center md:justify-between">
+                <p class="text-base text-gray-400 text-center md:text-left">
+                    &copy; 2024 Aksi Hijau Tangerang Selatan. Seluruh hak cipta dilindungi.
+                </p>
+                <p class="text-sm text-gray-500 text-center mt-4 md:mt-0">
+                    Dibuat dengan ❤️ untuk bumi yang lebih baik.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal Container -->
+    <div id="auth-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 modal-overlay transition-opacity" onclick="closeAuthModal()"></div>
+        
+        <!-- Modal Panel -->
+        <div class="bg-white rounded-2xl shadow-2xl relative w-full max-w-md transform transition-all overflow-hidden z-10">
+            <!-- Close Button -->
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-20">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+
+            <!-- Loading State (hidden by default) -->
+            <div id="auth-loading" class="hidden absolute inset-0 bg-white/90 z-30 flex flex-col items-center justify-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green mb-4"></div>
+                <p class="text-gray-600 font-medium">Memproses...</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="p-8 hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900">Selamat Datang Kembali</h2>
+                    <p class="text-sm text-gray-500 mt-2">Masuk ke akun Aksi Hijau Anda</p>
+                </div>
+                <form onsubmit="handleAuth(event, 'login')">
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="login-email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-shadow" placeholder="nama@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-shadow" placeholder="••••••••">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-brand-green hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md">
+                        Masuk
+                    </button>
+                </form>
+                <div class="mt-6 text-center text-sm text-gray-600">
+                    Belum punya akun? <button type="button" onclick="switchAuthView('register')" class="text-brand-green font-medium hover:underline">Daftar sekarang</button>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="p-8 hidden">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900">Gabung Komunitas</h2>
+                    <p class="text-sm text-gray-500 mt-2">Buat akun untuk mulai berkontribusi</p>
+                </div>
+                <form onsubmit="handleAuth(event, 'register')">
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                            <input type="text" id="reg-name" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-shadow" placeholder="Budi Santoso">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="reg-email" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-shadow" placeholder="budi@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <input type="password" id="reg-password" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-green focus:border-brand-green outline-none transition-shadow" placeholder="Min. 6 karakter">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-brand-blue hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md">
+                        Daftar Menjadi Member
+                    </button>
+                </form>
+                <div class="mt-6 text-center text-sm text-gray-600">
+                    Sudah punya akun? <button type="button" onclick="switchAuthView('login')" class="text-brand-green font-medium hover:underline">Masuk di sini</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[110] flex flex-col gap-2"></div>
+
+    <script>
+        /* State Management (Simulated) */
+        let currentUser = null; // null if not logged in, object if logged in
+        let userDonations = []; // Array to store simulation data
+        let totalDonatedAmt = 0;
+        let totalPoints = 0;
+
+        /* DOM Elements */
+        const publicView = document.getElementById('public-view');
+        const memberDashboard = document.getElementById('member-dashboard');
+        const publicMenu = document.getElementById('public-menu');
+        const memberMenu = document.getElementById('member-menu');
+        const mobilePublicLinks = document.getElementById('mobile-public-links');
+        const mobileMemberLinks = document.getElementById('mobile-member-links');
+        const authModal = document.getElementById('auth-modal');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenuDropdown = document.getElementById('mobile-menu-dropdown');
+
+        /* Mobile Menu Toggle */
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenuDropdown.classList.toggle('hidden');
+        });
+
+        function closeMobileMenu() {
+            mobileMenuDropdown.classList.add('hidden');
+        }
+
+        /* View Navigation */
+        function showSection(sectionId) {
+            // Smooth scroll to top when changing views
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            if (sectionId === 'public-view') {
+                publicView.classList.add('active-section');
+                publicView.classList.remove('hidden-section');
+                memberDashboard.classList.add('hidden-section');
+                memberDashboard.classList.remove('active-section');
+            } else if (sectionId === 'member-dashboard') {
+                if(!currentUser) {
+                    showToast("Silakan masuk terlebih dahulu.", "error");
+                    openAuthModal('login');
+                    return;
+                }
+                publicView.classList.add('hidden-section');
+                publicView.classList.remove('active-section');
+                memberDashboard.classList.add('active-section');
+                memberDashboard.classList.remove('hidden-section');
+                updateDashboardUI();
+            }
+        }
+
+        /* Auth Modal Logic */
+        function openAuthModal(type) {
+            authModal.classList.remove('hidden');
+            switchAuthView(type);
+        }
+
+        function closeAuthModal() {
+            authModal.classList.add('hidden');
+            // Clear inputs
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('reg-name').value = '';
+            document.getElementById('reg-email').value = '';
+            document.getElementById('reg-password').value = '';
+        }
+
+        function switchAuthView(type) {
+            if (type === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+            }
+        }
+
+        /* Handle Form Submission (Simulation) */
+        function handleAuth(event, type) {
+            event.preventDefault();
+            const loadingUI = document.getElementById('auth-loading');
+            loadingUI.classList.remove('hidden');
+
+            // Simulate network request
+            setTimeout(() => {
+                loadingUI.classList.add('hidden');
+                
+                let name = "Member";
+                if (type === 'register') {
+                    name = document.getElementById('reg-name').value;
+                    showToast("Registrasi berhasil! Selamat datang.", "success");
+                } else {
+                    // Extract name from email roughly for login simulation
+                    const email = document.getElementById('login-email').value;
+                    name = email.split('@')[0];
+                    showToast("Berhasil masuk.", "success");
+                }
+
+                // Set User state
+                currentUser = { name: name.charAt(0).toUpperCase() + name.slice(1) };
+                
+                closeAuthModal();
+                updateNavigationUI();
+                showSection('member-dashboard');
+
+            }, 1500);
+        }
+
+        function logout() {
+            currentUser = null;
+            userDonations = []; // Reset simulation data on logout
+            totalDonatedAmt = 0;
+            totalPoints = 0;
+            
+            updateNavigationUI();
+            showSection('public-view');
+            showToast("Berhasil keluar.", "info");
+        }
+
+        /* Update UI based on Auth State */
+        function updateNavigationUI() {
+            if (currentUser) {
+                // Show Member Menus, Hide Public Login/Reg
+                publicMenu.classList.add('hidden');
+                memberMenu.classList.remove('hidden');
+                mobilePublicLinks.classList.add('hidden');
+                mobileMemberLinks.classList.remove('hidden');
+                
+                // Update names
+                document.getElementById('user-name-display').innerText = currentUser.name;
+                document.getElementById('mobile-user-name-display').innerText = currentUser.name;
+                document.getElementById('dash-user-name').innerText = currentUser.name;
+            } else {
+                // Show Public Menus
+                publicMenu.classList.remove('hidden');
+                memberMenu.classList.add('hidden');
+                mobilePublicLinks.classList.remove('hidden');
+                mobileMemberLinks.classList.add('hidden');
+            }
+        }
+
+        /* Dashboard UI Updates */
+        function updateDashboardUI() {
+            // Update Stats
+            document.getElementById('dash-total-donation').innerText = formatRupiah(totalDonatedAmt);
+            document.getElementById('dash-points').innerHTML = `${totalPoints} <span class="text-base font-normal text-gray-500">Pts</span>`;
+            
+            // Update Activity List
+            const activityList = document.getElementById('activity-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (userDonations.length > 0) {
+                if(emptyState) emptyState.style.display = 'none';
+                
+                // Clear existing (except empty state which might be hidden)
+                activityList.innerHTML = '';
+                
+                // Render list (newest first)
+                [...userDonations].reverse().forEach(donation => {
+                    const li = document.createElement('li');
+                    li.className = "px-6 py-4 flex items-center hover:bg-gray-50 transition-colors";
+                    
+                    let icon, bgColor, textColor, projectName;
+                    if(donation.project === 'mangrove') {
+                        icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                        bgColor = "bg-emerald-100";
+                        textColor = "text-brand-green";
+                        projectName = "Penanaman Mangrove";
+                    } else {
+                        icon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>`;
+                        bgColor = "bg-blue-100";
+                        textColor = "text-brand-blue";
+                        projectName = "Edukasi Daur Ulang";
+                    }
+
+                    li.innerHTML = `
+                        <div class="flex-shrink-0 mr-4">
+                            <div class="p-2 rounded-full ${bgColor} ${textColor}">
+                                ${icon}
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">Donasi ${projectName}</p>
+                            <p class="text-sm text-gray-500 truncate">${donation.date}</p>
+                        </div>
+                        <div class="inline-flex items-center text-base font-semibold text-gray-900">
+                            + ${formatRupiah(donation.amount)}
+                        </div>
+                    `;
+                    activityList.appendChild(li);
+                });
+            } else {
+                activityList.innerHTML = `<li class="px-6 py-8 text-center text-gray-500" id="empty-state">Belum ada aktivitas. Mulai donasi pertama Anda!</li>`;
+            }
+        }
+
+        /* Crowdfunding Simulation */
+        // Initial state for demo
+        let projectData = {
+            'mangrove': { current: 12500000, target: 25000000 },
+            'sampah': { current: 4000000, target: 10000000 }
+        };
+
+        function simulateDonation(projectType) {
+            if (!currentUser) {
+                showToast("Yuk, daftar atau masuk dulu untuk berdonasi!", "info");
+                openAuthModal('login');
+                return;
+            }
+
+            const donationAmount = 50000;
+            
+            // Update local state
+            projectData[projectType].current += donationAmount;
+            totalDonatedAmt += donationAmount;
+            totalPoints += 50; // 1 point per Rp 1.000
+            
+            // Record activity
+            const today = new Date();
+            userDonations.push({
+                project: projectType,
+                amount: donationAmount,
+                date: today.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+            });
+
+            // Animate Progress Bar
+            const barId = projectType === 'mangrove' ? 'mangrove-progress-bar' : 'sampah-progress-bar';
+            const textId = projectType === 'mangrove' ? 'mangrove-collected-text' : 'sampah-collected-text';
+            
+            const percentage = Math.min((projectData[projectType].current / projectData[projectType].target) * 100, 100);
+            
+            document.getElementById(barId).style.width = `${percentage}%`;
+            document.getElementById(textId).innerText = formatRupiah(projectData[projectType].current);
+
+            showToast("Terima kasih! Donasi Rp 50.000 berhasil.", "success");
+        }
+
+        /* Utilities */
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+        }
+
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass = "bg-gray-800";
+            if (type === "success") bgClass = "bg-brand-green";
+            if (type === "error") bgClass = "bg-red-500";
+            if (type === "info") bgClass = "bg-brand-blue";
+
+            toast.className = `${bgClass} text-white px-6 py-3 rounded-xl shadow-lg transform transition-all duration-300 translate-y-10 opacity-0 flex items-center`;
+            toast.innerHTML = `
+                <span class="mr-2">
+                    ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'i'}
+                </span>
+                ${message}
+            `;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 10);
+
+            // Animate out and remove
+            setTimeout(() => {
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize state on load
+        updateNavigationUI();
+    </script>
+</body>
+</html>
